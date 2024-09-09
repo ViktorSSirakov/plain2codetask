@@ -36,7 +36,7 @@ def does_plain_file_exist(filename):
         return False
 def clear_folder(address):
     for item in os.listdir(address):
-        item = address + f'\\{item}'
+        item = os.path.join(address, item)
         if os.path.isdir(item):
             shutil.rmtree(item)
         else:
