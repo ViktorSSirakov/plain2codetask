@@ -75,8 +75,11 @@ def main():
         if verbose:
             print('Verbose mode is activated!')
         build_folder = os.path.abspath( args.build_folder)
+
         if os.path.exists(build_folder) and os.path.isdir(build_folder):
             contents = os.listdir(build_folder)
+            if verbose:
+                print(contents)
             if contents != []:
                 clear_folder(build_folder)
             if verbose:
@@ -85,8 +88,11 @@ def main():
             if verbose:
                 print(f"The folder '{build_folder}' will be created.")
             os.makedirs(build_folder)
+        
         if type(args.copy_base_folder) == str:
-            copy_base_files(build_folder, args.copy_base_folder, verbose)
+            if verbose:
+                print('Copying to the build folder!')
+            copy_base_files(args.copy_base_folder, build_folder, verbose)
         base_url = "https://api.codeplain.ai"
         api_url_plain_sections = base_url + "/plain_sections"
         headers_plain_sections = {
@@ -105,6 +111,7 @@ def main():
         file_data = response_plain_sections.json()
         print(f'Rendering {plain_source_file} to software code: \n')
         do_unit_test = args.test_code
+        
         for i in range(1, len(file_data['Functional Requirements:']) + 1):
             print(f'Rendering the {i} functional requierment:')
             print(file_data['Functional Requirements:'][i - 1])
@@ -118,9 +125,9 @@ def main():
                 "plain_sections": file_data,
                 "existing_files_content": load_existing_files(build_folder)
             }
+            
             response_rendering = requests.post(api_url_render_functional_requierments, headers=headers_rendering, json=payload_rendering)
             for title, code in response_rendering.json().items():
-                
                 file_path = os.path.join(build_folder, title)
                 with open(file_path, 'w') as file:
                     file.write(code)
